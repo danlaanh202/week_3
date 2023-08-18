@@ -1,0 +1,30 @@
+{
+  "name": "firestore",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/app.js",
+  "scripts": {
+    "dev": "nodemon lib/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "production": "babel src --out-dir lib --copy-files --include-dotfiles",
+    "development": "babel src --out-dir lib --copy-files --source-maps --include-dotfiles",
+    "watch": "babel src --out-dir lib --copy-files --source-maps --include-dotfiles --watch --verbose"
+  },
+  "dependencies": {
+    "@koa/cors": "^4.0.0",
+    "koa": "^2.13.1",
+    "koa-body": "^4.2.0",
+    "koa-router": "^10.0.0",
+    "firebase-admin": "^9.5.0",
+    "yup": "^0.32.9"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.6.0",
+    "@babel/core": "^7.6.0",
+    "@babel/preset-env": "^7.6.0",
+    "nodemon": "^1.18.4"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
