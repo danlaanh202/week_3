@@ -3,6 +3,7 @@ const yup = require("yup");
 export default async function todoInputMiddleware(ctx, next) {
   try {
     const postData = ctx.request.body;
+
     let schema = yup.object().shape({
       id: yup.string().required(),
       text: yup.string().required(),
@@ -10,7 +11,7 @@ export default async function todoInputMiddleware(ctx, next) {
     });
 
     await schema.validate(postData);
-    next();
+    return next();
   } catch (e) {
     ctx.status = 400;
     ctx.body = {

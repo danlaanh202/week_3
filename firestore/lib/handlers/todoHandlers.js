@@ -30,14 +30,11 @@ async function getTodoes(ctx) {
 async function createTd(ctx) {
   try {
     await (0, _todoRepository.createTodo)(ctx.request.body);
-    ctx.status = 201;
     return ctx.body = {
       success: true,
-      data
+      data: ctx.request.body
     };
   } catch (e) {
-    console.log("hahaha");
-    ctx.status = ctx.request.body;
     return ctx.body = {
       success: false,
       error: e.message

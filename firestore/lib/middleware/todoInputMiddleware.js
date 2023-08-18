@@ -14,7 +14,7 @@ async function todoInputMiddleware(ctx, next) {
       isCompleted: yup.boolean().required()
     });
     await schema.validate(postData);
-    next();
+    return next();
   } catch (e) {
     ctx.status = 400;
     ctx.body = {
