@@ -14,7 +14,7 @@ export async function createTodo(data) {
 
 export async function removeTodo(id) {
   return await todoRef.doc(id).delete();
-}
+}c
 
 export async function toggleTodo(id) {
   const updateDoc = await todoRef.doc(id).get();

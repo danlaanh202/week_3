@@ -23,6 +23,7 @@ async function createTodo(data) {
 async function removeTodo(id) {
   return await todoRef.doc(id).delete();
 }
+c;
 async function toggleTodo(id) {
   const updateDoc = await todoRef.doc(id).get();
   await updateDoc.ref.update({
