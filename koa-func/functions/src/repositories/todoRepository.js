@@ -28,7 +28,7 @@ export async function removeMultipleTodos(ids) {
   if (!ids?.length) {
     throw new Error("");
   }
-  console.log(ids);
+
   // ============ Batch writes usage ===========
   /*
   let batch = db.batch();

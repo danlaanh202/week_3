@@ -1,5 +1,5 @@
 import admin from "firebase-admin";
-import db from "./dbInit";
+import db from "./db";
 import { v4 as uuid } from "uuid";
 const todoRef = db.collection("todos");
 const documentId = admin.firestore.FieldPath.documentId();
@@ -10,8 +10,9 @@ export async function getAllTodos() {
 
 export async function createTodo(data) {
   const generatedId = uuid();
-  await todoRef.doc(generatedId).set(data);
-  return { ...data, id: generatedId };
+  const createdTodo = { ...data, createdAt: admin.firestore.Timestamp.now() };
+  await todoRef.doc(generatedId).set(createdTodo);
+  return createdTodo;
 }
 
 export async function removeTodo(id) {
@@ -20,14 +21,16 @@ export async function removeTodo(id) {
 
 export async function toggleTodo(id) {
   const updateDoc = await todoRef.doc(id).get();
-  await updateDoc.ref.update({
+  return await updateDoc.ref.update({
     isCompleted: !updateDoc.data().isCompleted,
+    updatedAt: admin.firestore.Timestamp.now(),
   });
 }
 export async function removeMultipleTodos(ids) {
-  if (ids?.length) {
+  if (!ids?.length) {
     throw new Error();
   }
+
   // ============ Batch writes usage ===========
   /*
   let batch = db.batch();
@@ -46,7 +49,7 @@ export async function removeMultipleTodos(ids) {
   return await Promise.all(deletes);
 }
 export async function completeMultipleTodos(ids) {
-  if (ids?.length === 0) {
+  if (!ids?.length) {
     throw new Error();
   }
   // ============ Batch writes usage ===========
@@ -68,6 +71,7 @@ export async function completeMultipleTodos(ids) {
     updates.push(
       documentSnapshot.ref.update({
         isCompleted: !documentSnapshot.data().isCompleted,
+        updatedAt: admin.firestore.Timestamp.now(),
       })
     );
   }

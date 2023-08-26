@@ -28,6 +28,7 @@ export async function getTodos(ctx) {
 export async function createTd(ctx) {
   try {
     const data = await createTodo(ctx.request.body);
+    ctx.status = 201;
     return (ctx.body = {
       success: true,
       data,
@@ -59,9 +60,8 @@ export async function remove(ctx) {
 export async function toggle(ctx) {
   try {
     const { id } = ctx.request.params;
-
     await toggleTodo(id);
-    ctx.status = 201;
+    ctx.status = 200;
     return (ctx.body = {
       success: true,
     });
@@ -77,7 +77,7 @@ export async function completeMultiple(ctx) {
   try {
     const { ids } = ctx.request.body;
     await completeMultipleTodos(ids);
-    ctx.status = 201;
+    ctx.status = 200;
     return (ctx.body = {
       success: true,
     });
@@ -97,6 +97,7 @@ export async function removeMultiple(ctx) {
       success: true,
     });
   } catch (error) {
+    console.log(error);
     return (ctx.body = {
       success: false,
       error: error.message,

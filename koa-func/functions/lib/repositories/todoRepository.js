@@ -1,7 +1,7 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true,
+  value: true
 });
 exports.completeMultipleTodos = completeMultipleTodos;
 exports.createTodo = createTodo;
@@ -12,16 +12,14 @@ exports.toggleTodo = toggleTodo;
 var _firebaseAdmin = _interopRequireDefault(require("firebase-admin"));
 var _db = _interopRequireDefault(require("../config/db"));
 var _uuid = require("uuid");
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { default: obj };
-}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 const todoRef = _db.default.collection("todos");
 const documentId = _firebaseAdmin.default.firestore.FieldPath.documentId();
 async function getAllTodos() {
   const snapshot = await todoRef.get();
-  return snapshot.docs.map((doc) => ({
+  return snapshot.docs.map(doc => ({
     ...doc.data(),
-    id: doc.id,
+    id: doc.id
   }));
 }
 async function createTodo(data) {
@@ -29,7 +27,7 @@ async function createTodo(data) {
   await todoRef.doc(generatedId).set(data);
   return {
     ...data,
-    id: generatedId,
+    id: generatedId
   };
 }
 async function removeTodo(id) {
@@ -38,14 +36,14 @@ async function removeTodo(id) {
 async function toggleTodo(id) {
   const updateDoc = await todoRef.doc(id).get();
   await updateDoc.ref.update({
-    isCompleted: !updateDoc.data().isCompleted,
+    isCompleted: !updateDoc.data().isCompleted
   });
 }
 async function removeMultipleTodos(ids) {
   if (!ids?.length) {
     throw new Error("");
   }
-  console.log(ids);
+
   // ============ Batch writes usage ===========
   /*
   let batch = db.batch();
@@ -84,11 +82,9 @@ async function completeMultipleTodos(ids) {
   const querySnapshot = await todoRef.where(documentId, "in", ids).get();
   const updates = [];
   for (const documentSnapshot of querySnapshot.docs) {
-    updates.push(
-      documentSnapshot.ref.update({
-        isCompleted: !documentSnapshot.data().isCompleted,
-      })
-    );
+    updates.push(documentSnapshot.ref.update({
+      isCompleted: !documentSnapshot.data().isCompleted
+    }));
   }
   return await Promise.all(updates);
 }

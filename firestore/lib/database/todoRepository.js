@@ -1,7 +1,7 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true,
+  value: true
 });
 exports.completeMultipleTodos = completeMultipleTodos;
 exports.createTodo = createTodo;
@@ -10,41 +10,42 @@ exports.removeMultipleTodos = removeMultipleTodos;
 exports.removeTodo = removeTodo;
 exports.toggleTodo = toggleTodo;
 var _firebaseAdmin = _interopRequireDefault(require("firebase-admin"));
-var _dbInit = _interopRequireDefault(require("./dbInit"));
+var _db = _interopRequireDefault(require("./db"));
 var _uuid = require("uuid");
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { default: obj };
-}
-const todoRef = _dbInit.default.collection("todos");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+const todoRef = _db.default.collection("todos");
 const documentId = _firebaseAdmin.default.firestore.FieldPath.documentId();
 async function getAllTodos() {
   const snapshot = await todoRef.get();
-  return snapshot.docs.map((doc) => ({
+  return snapshot.docs.map(doc => ({
     ...doc.data(),
-    id: doc.id,
+    id: doc.id
   }));
 }
 async function createTodo(data) {
   const generatedId = (0, _uuid.v4)();
-  await todoRef.doc(generatedId).set(data);
-  return {
+  const createdTodo = {
     ...data,
-    id: generatedId,
+    createdAt: _firebaseAdmin.default.firestore.Timestamp.now()
   };
+  await todoRef.doc(generatedId).set(createdTodo);
+  return createdTodo;
 }
 async function removeTodo(id) {
   return await todoRef.doc(id).delete();
 }
 async function toggleTodo(id) {
   const updateDoc = await todoRef.doc(id).get();
-  await updateDoc.ref.update({
+  return await updateDoc.ref.update({
     isCompleted: !updateDoc.data().isCompleted,
+    updatedAt: _firebaseAdmin.default.firestore.Timestamp.now()
   });
 }
 async function removeMultipleTodos(ids) {
-  if (ids?.length === 0) {
+  if (!ids?.length) {
     throw new Error();
   }
+
   // ============ Batch writes usage ===========
   /*
   let batch = db.batch();
@@ -63,7 +64,7 @@ async function removeMultipleTodos(ids) {
   return await Promise.all(deletes);
 }
 async function completeMultipleTodos(ids) {
-  if (ids?.length === 0) {
+  if (!ids?.length) {
     throw new Error();
   }
   // ============ Batch writes usage ===========
@@ -82,11 +83,10 @@ async function completeMultipleTodos(ids) {
   const querySnapshot = await todoRef.where(documentId, "in", ids).get();
   const updates = [];
   for (const documentSnapshot of querySnapshot.docs) {
-    updates.push(
-      documentSnapshot.ref.update({
-        isCompleted: !documentSnapshot.data().isCompleted,
-      })
-    );
+    updates.push(documentSnapshot.ref.update({
+      isCompleted: !documentSnapshot.data().isCompleted,
+      updatedAt: _firebaseAdmin.default.firestore.Timestamp.now()
+    }));
   }
   return await Promise.all(updates);
 }

@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "production": "babel src --out-dir lib --copy-files --include-dotfiles",
     "development": "babel src --out-dir lib --copy-files --source-maps --include-dotfiles",
-    "watch": "babel src --out-dir lib --copy-files --source-maps --include-dotfiles --watch --verbose"
+    "watch": "babel src --out-dir lib --copy-files --source-maps --include-dotfiles --watch --verbose",
+    "dev:watch": " concurrently \"npm run watch\" \"npm run dev\""
   },
   "dependencies": {
     "@koa/cors": "^4.0.0",
