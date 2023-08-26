@@ -1,19 +1,21 @@
-import {
-  createTodo,
-  getAllTodoes,
-  removeTodo,
-  removeMultipleTodoes,
-  toggleTodo,
-  toggleMultipleTodoes,
-} from "../database/todoRepository";
+"use strict";
 
-export async function getTodoes(ctx) {
+Object.defineProperty(exports, "__esModule", {
+  value: true,
+});
+exports.completeMultiple = completeMultiple;
+exports.createTd = createTd;
+exports.getTodos = getTodos;
+exports.remove = remove;
+exports.removeMultiple = removeMultiple;
+exports.toggle = toggle;
+var _todoRepository = require("../../../repositories/todoRepository");
+async function getTodos(ctx) {
   try {
-    const todoes = getAllTodoes();
+    const todos = await (0, _todoRepository.getAllTodos)();
     ctx.status = 200;
-
     return (ctx.body = {
-      data: todoes,
+      data: todos,
       success: true,
     });
   } catch (e) {
@@ -25,29 +27,24 @@ export async function getTodoes(ctx) {
     });
   }
 }
-
-export async function createTd(ctx) {
+async function createTd(ctx) {
   try {
-    const data = ctx.request.body;
-    createTodo(data);
-    ctx.status = 201;
+    const data = await (0, _todoRepository.createTodo)(ctx.req.body);
     return (ctx.body = {
       success: true,
       data,
     });
   } catch (e) {
-    ctx.status = 500;
     return (ctx.body = {
       success: false,
       error: e.message,
     });
   }
 }
-
-export async function remove(ctx) {
+async function remove(ctx) {
   try {
     const { id } = ctx.params;
-    removeTodo(id);
+    await (0, _todoRepository.removeTodo)(id);
     ctx.status = 200;
     return (ctx.body = {
       success: true,
@@ -59,12 +56,10 @@ export async function remove(ctx) {
     });
   }
 }
-
-export async function toggle(ctx) {
+async function toggle(ctx) {
   try {
-    const { id } = JSON.parse(ctx.request.body);
-
-    toggleTodo(id);
+    const { id } = ctx.params;
+    await (0, _todoRepository.toggleTodo)(id);
     ctx.status = 201;
     return (ctx.body = {
       success: true,
@@ -76,11 +71,10 @@ export async function toggle(ctx) {
     });
   }
 }
-
-export async function toggleMultiple(ctx) {
+async function completeMultiple(ctx) {
   try {
-    const { ids } = JSON.parse(ctx.request.body);
-    toggleMultipleTodoes(ids);
+    const { ids } = ctx.req.body;
+    await (0, _todoRepository.completeMultipleTodos)(ids);
     ctx.status = 201;
     return (ctx.body = {
       success: true,
@@ -92,11 +86,10 @@ export async function toggleMultiple(ctx) {
     });
   }
 }
-export async function removeMultiple(ctx) {
-  // POST METHOD
+async function removeMultiple(ctx) {
   try {
-    const { ids } = ctx.request.body;
-    removeMultipleTodoes(ids);
+    const { ids } = ctx.req.body;
+    await (0, _todoRepository.removeMultipleTodos)(ids);
     ctx.status = 200;
     return (ctx.body = {
       success: true,
@@ -108,3 +101,4 @@ export async function removeMultiple(ctx) {
     });
   }
 }
+//# sourceMappingURL=todoController.js.map

@@ -1,0 +1,40 @@
+{
+  "version": 3,
+  "file": "todoController.js",
+  "names": [
+    "_todoRepository",
+    "require",
+    "getTodos",
+    "ctx",
+    "todos",
+    "getAllTodos",
+    "status",
+    "body",
+    "data",
+    "success",
+    "e",
+    "error",
+    "message",
+    "createTd",
+    "createTodo",
+    "req",
+    "remove",
+    "id",
+    "params",
+    "removeTodo",
+    "toggle",
+    "toggleTodo",
+    "completeMultiple",
+    "ids",
+    "completeMultipleTodos",
+    "removeMultiple",
+    "removeMultipleTodos"
+  ],
+  "sources": [
+    "../../../../src/handlers/api/controllers/todoController.js"
+  ],
+  "sourcesContent": [
+    "import {\r\n  createTodo,\r\n  getAllTodos,\r\n  removeTodo,\r\n  removeMultipleTodos,\r\n  toggleTodo,\r\n  completeMultipleTodos,\r\n} from \"../../../repositories/todoRepository\";\r\n\r\nexport async function getTodos(ctx) {\r\n  try {\r\n    const todos = await getAllTodos();\r\n    ctx.status = 200;\r\n    return (ctx.body = {\r\n      data: todos,\r\n      success: true,\r\n    });\r\n  } catch (e) {\r\n    ctx.status = 500;\r\n    return (ctx.body = {\r\n      success: false,\r\n      data: [],\r\n      error: e.message,\r\n    });\r\n  }\r\n}\r\n\r\nexport async function createTd(ctx) {\r\n  try {\r\n    const data = await createTodo(ctx.req.body);\r\n    return (ctx.body = {\r\n      success: true,\r\n      data,\r\n    });\r\n  } catch (e) {\r\n    return (ctx.body = {\r\n      success: false,\r\n      error: e.message,\r\n    });\r\n  }\r\n}\r\n\r\nexport async function remove(ctx) {\r\n  try {\r\n    const { id } = ctx.params;\r\n    await removeTodo(id);\r\n    ctx.status = 200;\r\n    return (ctx.body = {\r\n      success: true,\r\n    });\r\n  } catch (error) {\r\n    return (ctx.body = {\r\n      success: false,\r\n      error: error.message,\r\n    });\r\n  }\r\n}\r\n\r\nexport async function toggle(ctx) {\r\n  try {\r\n    const { id } = ctx.params;\r\n\r\n    await toggleTodo(id);\r\n    ctx.status = 201;\r\n    return (ctx.body = {\r\n      success: true,\r\n    });\r\n  } catch (error) {\r\n    return (ctx.body = {\r\n      success: false,\r\n      error: error.message,\r\n    });\r\n  }\r\n}\r\n\r\nexport async function completeMultiple(ctx) {\r\n  try {\r\n    const { ids } = ctx.req.body;\r\n    await completeMultipleTodos(ids);\r\n    ctx.status = 201;\r\n    return (ctx.body = {\r\n      success: true,\r\n    });\r\n  } catch (error) {\r\n    return (ctx.body = {\r\n      success: false,\r\n      error: error.message,\r\n    });\r\n  }\r\n}\r\nexport async function removeMultiple(ctx) {\r\n  try {\r\n    const { ids } = ctx.req.body;\r\n\r\n    await removeMultipleTodos(ids);\r\n    ctx.status = 200;\r\n    return (ctx.body = {\r\n      success: true,\r\n    });\r\n  } catch (error) {\r\n    return (ctx.body = {\r\n      success: false,\r\n      error: error.message,\r\n    });\r\n  }\r\n}\r\n"
+  ],
+  "mappings": "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"
+}

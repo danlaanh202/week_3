@@ -7,7 +7,9 @@ var _cors = _interopRequireDefault(require("@koa/cors"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 const app = new _koa.default();
 app.use((0, _cors.default)());
-app.use((0, _koaBody.default)());
+app.use((0, _koaBody.default)({
+  parsedMethods: ["POST", "PUT", "PATCH", "DELETE"]
+}));
 app.use(_routes.default.routes());
 app.use(_routes.default.allowedMethods());
 app.listen(5000);

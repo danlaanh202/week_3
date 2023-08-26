@@ -1,24 +1,36 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+  value: true,
 });
-exports.completeMultipleTodoes = completeMultipleTodoes;
+exports.completeMultipleTodos = completeMultipleTodos;
 exports.createTodo = createTodo;
-exports.getAllTodoes = getAllTodoes;
-exports.removeMultipleTodoes = removeMultipleTodoes;
+exports.getAllTodos = getAllTodos;
+exports.removeMultipleTodos = removeMultipleTodos;
 exports.removeTodo = removeTodo;
 exports.toggleTodo = toggleTodo;
+var _firebaseAdmin = _interopRequireDefault(require("firebase-admin"));
 var _dbInit = _interopRequireDefault(require("./dbInit"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-const todoRef = _dbInit.default.collection("todoes");
-async function getAllTodoes() {
+var _uuid = require("uuid");
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+const todoRef = _dbInit.default.collection("todos");
+const documentId = _firebaseAdmin.default.firestore.FieldPath.documentId();
+async function getAllTodos() {
   const snapshot = await todoRef.get();
-  return snapshot.docs.map(doc => doc.data());
+  return snapshot.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  }));
 }
 async function createTodo(data) {
-  const res = await todoRef.doc(data.id).set(data);
-  return res;
+  const generatedId = (0, _uuid.v4)();
+  await todoRef.doc(generatedId).set(data);
+  return {
+    ...data,
+    id: generatedId,
+  };
 }
 async function removeTodo(id) {
   return await todoRef.doc(id).delete();
@@ -26,30 +38,56 @@ async function removeTodo(id) {
 async function toggleTodo(id) {
   const updateDoc = await todoRef.doc(id).get();
   await updateDoc.ref.update({
-    isCompleted: !updateDoc.data().isCompleted
+    isCompleted: !updateDoc.data().isCompleted,
   });
 }
-async function removeMultipleTodoes(ids) {
-  if (!ids || ids?.length === 0) {
-    return;
+async function removeMultipleTodos(ids) {
+  if (ids?.length === 0) {
+    throw new Error();
   }
-  const docs = await todoRef.where("id", "in", ids).get();
-  let batch = _dbInit.default.batch();
-  docs.forEach(doc => {
-    batch.delete(doc.ref);
-  });
+  // ============ Batch writes usage ===========
+  /*
+  let batch = db.batch();
+  const querySnapshot = await todoRef.where(documentId, "in", ids).get();
+  for (const documentSnapshot of querySnapshot.docs) {
+    batch.delete(documentSnapshot.ref);
+  }
   return batch.commit();
-}
-async function completeMultipleTodoes(ids) {
-  if (!ids) {
-    return;
+  */
+  // ============ Promise.all usage ===========
+  const querySnapshot = await todoRef.where(documentId, "in", ids).get();
+  const deletes = [];
+  for (const documentSnapshot of querySnapshot.docs) {
+    deletes.push(documentSnapshot.ref.delete());
   }
-  const docs = await todoRef.where("id", "in", ids).get();
-  docs.forEach(doc => {
-    batch.update(doc.ref, {
-      isCompleted: true
+  return await Promise.all(deletes);
+}
+async function completeMultipleTodos(ids) {
+  if (ids?.length === 0) {
+    throw new Error();
+  }
+  // ============ Batch writes usage ===========
+  /* let batch = db.batch();
+  const querySnapshot = await todoRef.where(documentId, "in", ids).get();
+  for (const documentSnapshot of querySnapshot.docs) {
+    batch.update(documentSnapshot.ref, {
+      isCompleted: !documentSnapshot.doc().isCompleted,
     });
-  });
+  }
   return batch.commit();
+  */
+
+  // ============ Promise.all usage ===========
+
+  const querySnapshot = await todoRef.where(documentId, "in", ids).get();
+  const updates = [];
+  for (const documentSnapshot of querySnapshot.docs) {
+    updates.push(
+      documentSnapshot.ref.update({
+        isCompleted: !documentSnapshot.data().isCompleted,
+      })
+    );
+  }
+  return await Promise.all(updates);
 }
 //# sourceMappingURL=todoRepository.js.map

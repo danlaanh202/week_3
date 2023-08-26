@@ -12,10 +12,11 @@
   },
   "dependencies": {
     "@koa/cors": "^4.0.0",
+    "firebase-admin": "^9.5.0",
     "koa": "^2.13.1",
     "koa-body": "^4.2.0",
     "koa-router": "^10.0.0",
-    "firebase-admin": "^9.5.0",
+    "uuid": "^9.0.0",
     "yup": "^0.32.9"
   },
   "devDependencies": {

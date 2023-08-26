@@ -1,18 +1,18 @@
 import {
   createTodo,
-  getAllTodoes,
+  getAllTodos,
   removeTodo,
-  removeMultipleTodoes,
+  removeMultipleTodos,
   toggleTodo,
-  completeMultipleTodoes,
+  completeMultipleTodos,
 } from "../database/todoRepository";
 
-export async function getTodoes(ctx) {
+export async function getTodos(ctx) {
   try {
-    const todoes = await getAllTodoes();
+    const todos = await getAllTodos();
     ctx.status = 200;
     return (ctx.body = {
-      data: todoes,
+      data: todos,
       success: true,
     });
   } catch (e) {
@@ -27,10 +27,10 @@ export async function getTodoes(ctx) {
 
 export async function createTd(ctx) {
   try {
-    await createTodo(ctx.request.body);
+    const data = await createTodo(ctx.request.body);
     return (ctx.body = {
       success: true,
-      data: ctx.request.body,
+      data,
     });
   } catch (e) {
     return (ctx.body = {
@@ -58,7 +58,8 @@ export async function remove(ctx) {
 
 export async function toggle(ctx) {
   try {
-    const { id } = ctx.request.body;
+    const { id } = ctx.request.params;
+
     await toggleTodo(id);
     ctx.status = 201;
     return (ctx.body = {
@@ -75,7 +76,7 @@ export async function toggle(ctx) {
 export async function completeMultiple(ctx) {
   try {
     const { ids } = ctx.request.body;
-    await completeMultipleTodoes(ids);
+    await completeMultipleTodos(ids);
     ctx.status = 201;
     return (ctx.body = {
       success: true,
@@ -88,10 +89,9 @@ export async function completeMultiple(ctx) {
   }
 }
 export async function removeMultiple(ctx) {
-  // POST METHOD
   try {
     const { ids } = ctx.request.body;
-    await removeMultipleTodoes(ids);
+    await removeMultipleTodos(ids);
     ctx.status = 200;
     return (ctx.body = {
       success: true,

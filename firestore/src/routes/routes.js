@@ -6,12 +6,12 @@ const router = new Router({
   prefix: "/api",
 });
 
-router.get("/todoes", todoHandler.getTodoes);
+router.get("/todos", todoHandler.getTodos);
 router.post("/todo", todoInputMiddleware, todoHandler.createTd);
-router.put("/todo", todoHandler.toggle);
-router.put("/todoes", todoHandler.completeMultiple);
+router.put("/todo/:id", todoHandler.toggle);
+router.put("/todos", todoHandler.completeMultiple);
 router.delete("/todo/:id", todoHandler.remove);
-router.post("/todoes", todoHandler.removeMultiple);
-// router.delele("/todoes", todoHandler.removeMultiple) //http://localhost:5000/todoes?ids=a&ids=b&...
+router.delete("/todos", todoHandler.removeMultiple);
+// router.delele("/todos", todoHandler.removeMultiple) //http://localhost:5000/todos?ids=a&ids=b&...
 
 export default router;
