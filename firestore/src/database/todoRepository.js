@@ -7,6 +7,9 @@ const documentId = admin.firestore.FieldPath.documentId();
 
 export async function getOneTodo(id, fields) {
   const docRef = await todoRef.doc(id).get();
+  if (!docRef.data()) {
+    throw new Error();
+  }
   const todo = { ...docRef.data(), id: docRef.id };
 
   if (fields?.length > 0) {
@@ -16,11 +19,11 @@ export async function getOneTodo(id, fields) {
 }
 
 export async function getTodosWithParams(params) {
-  const { sort, limit } = params;
+  const { sort = "desc", limit } = params;
 
   let orderRef = todoRef.orderBy("createdAt", sort);
   if (limit) {
-    orderRef = orderRef.limit(limit);
+    orderRef = todoRef.orderBy("createdAt", sort).limit(limit);
   }
   const snapshot = await orderRef.get();
   return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
@@ -58,6 +61,7 @@ export async function removeTodos(ids) {
   }
   return await Promise.all(deletes);
 }
+
 export async function updateTodos(ids) {
   if (!ids?.length) {
     throw new Error();

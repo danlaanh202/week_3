@@ -16,6 +16,9 @@ const todoRef = _db.default.collection("todos");
 const documentId = _firebaseAdmin.default.firestore.FieldPath.documentId();
 async function getOneTodo(id, fields) {
   const docRef = await todoRef.doc(id).get();
+  if (!docRef.data()) {
+    throw new Error();
+  }
   const todo = {
     ...docRef.data(),
     id: docRef.id
@@ -27,12 +30,12 @@ async function getOneTodo(id, fields) {
 }
 async function getTodosWithParams(params) {
   const {
-    sort,
+    sort = "desc",
     limit
   } = params;
   let orderRef = todoRef.orderBy("createdAt", sort);
   if (limit) {
-    orderRef = orderRef.limit(limit);
+    orderRef = todoRef.orderBy("createdAt", sort).limit(limit);
   }
   const snapshot = await orderRef.get();
   return snapshot.docs.map(doc => ({
