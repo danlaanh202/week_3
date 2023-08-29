@@ -14,7 +14,6 @@ var _pickFields = _interopRequireDefault(require("../helpers/utils/pickFields"))
 var _prepareDocs = _interopRequireDefault(require("../helpers/utils/prepareDocs"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 const todoRef = _db.default.collection("todos");
-const documentId = _firebaseAdmin.default.firestore.FieldPath.documentId();
 async function getOneTodo(id, fields) {
   const docRef = await todoRef.doc(id).get();
   if (!docRef.data()) {
@@ -36,7 +35,7 @@ async function getTodosWithParams(params) {
   } = params;
   let orderRef = todoRef.orderBy("createdAt", sort);
   if (limit) {
-    orderRef = todoRef.orderBy("createdAt", sort).limit(parseInt(limit));
+    orderRef = orderRef.limit(parseInt(limit));
   }
   const snapshot = await orderRef.get();
   return (0, _prepareDocs.default)(snapshot);
@@ -64,15 +63,6 @@ async function updateTodos(todos) {
   if (!todos?.length) {
     throw new Error();
   }
-
-  // const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-
-  // const updates = querySnapshot.docs.map((doc) =>
-  //   doc.ref.update({
-  //     isCompleted: !doc.data().isCompleted,
-  //     updatedAt: admin.firestore.Timestamp.now(),
-  //   })
-  // );
   const updates = todos.map(todo => todoRef.doc(todo.id).update({
     isCompleted: todo.isCompleted,
     updatedAt: _firebaseAdmin.default.firestore.Timestamp.now()

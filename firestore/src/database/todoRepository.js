@@ -4,7 +4,6 @@ import pickFields from "../helpers/utils/pickFields";
 import prepareDocs from "../helpers/utils/prepareDocs";
 
 const todoRef = db.collection("todos");
-const documentId = admin.firestore.FieldPath.documentId();
 
 export async function getOneTodo(id, fields) {
   const docRef = await todoRef.doc(id).get();
@@ -24,7 +23,7 @@ export async function getTodosWithParams(params) {
 
   let orderRef = todoRef.orderBy("createdAt", sort);
   if (limit) {
-    orderRef = todoRef.orderBy("createdAt", sort).limit(parseInt(limit));
+    orderRef = orderRef.limit(parseInt(limit));
   }
   const snapshot = await orderRef.get();
 
@@ -55,14 +54,6 @@ export async function updateTodos(todos) {
     throw new Error();
   }
 
-  // const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-
-  // const updates = querySnapshot.docs.map((doc) =>
-  //   doc.ref.update({
-  //     isCompleted: !doc.data().isCompleted,
-  //     updatedAt: admin.firestore.Timestamp.now(),
-  //   })
-  // );
   const updates = todos.map((todo) =>
     todoRef.doc(todo.id).update({
       isCompleted: todo.isCompleted,

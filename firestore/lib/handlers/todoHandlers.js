@@ -107,7 +107,6 @@ async function updateMultiple(ctx) {
     const {
       todos
     } = ctx.request.body;
-    console.log(todos);
     await (0, _todoRepository.updateTodos)(todos);
     ctx.status = 200;
     return ctx.body = {

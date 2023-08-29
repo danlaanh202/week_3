@@ -94,7 +94,6 @@ export async function update(ctx) {
 export async function updateMultiple(ctx) {
   try {
     const { todos } = ctx.request.body;
-    console.log(todos);
     await updateTodos(todos);
     ctx.status = 200;
     return (ctx.body = {
