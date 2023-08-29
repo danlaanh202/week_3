@@ -11,6 +11,7 @@ exports.updateTodos = updateTodos;
 var _firebaseAdmin = _interopRequireDefault(require("firebase-admin"));
 var _db = _interopRequireDefault(require("./db"));
 var _pickFields = _interopRequireDefault(require("../helpers/utils/pickFields"));
+var _prepareDocs = _interopRequireDefault(require("../helpers/utils/prepareDocs"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 const todoRef = _db.default.collection("todos");
 const documentId = _firebaseAdmin.default.firestore.FieldPath.documentId();
@@ -31,17 +32,14 @@ async function getOneTodo(id, fields) {
 async function getTodosWithParams(params) {
   const {
     sort = "desc",
-    limit
+    limit = 100
   } = params;
   let orderRef = todoRef.orderBy("createdAt", sort);
   if (limit) {
-    orderRef = todoRef.orderBy("createdAt", sort).limit(limit);
+    orderRef = todoRef.orderBy("createdAt", sort).limit(parseInt(limit));
   }
   const snapshot = await orderRef.get();
-  return snapshot.docs.map(doc => ({
-    ...doc.data(),
-    id: doc.id
-  }));
+  return (0, _prepareDocs.default)(snapshot);
 }
 async function createTodo(data) {
   const createdTodo = {
@@ -59,49 +57,19 @@ async function removeTodos(ids) {
   if (!ids?.length) {
     throw new Error();
   }
-
-  // ============ Batch writes usage ===========
-  /*
-  let batch = db.batch();
   const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-  for (const documentSnapshot of querySnapshot.docs) {
-    batch.delete(documentSnapshot.ref);
-  }
-  return batch.commit();
-  */
-  // ============ Promise.all usage ===========
-  const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-  const deletes = [];
-  for (const documentSnapshot of querySnapshot.docs) {
-    deletes.push(documentSnapshot.ref.delete());
-  }
+  const deletes = querySnapshot.docs.map(doc => doc.ref.delete());
   return await Promise.all(deletes);
 }
 async function updateTodos(ids) {
   if (!ids?.length) {
     throw new Error();
   }
-  // ============ Batch writes usage ===========
-  /* let batch = db.batch();
   const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-  for (const documentSnapshot of querySnapshot.docs) {
-    batch.update(documentSnapshot.ref, {
-      isCompleted: !documentSnapshot.doc().isCompleted,
-    });
-  }
-  return batch.commit();
-  */
-
-  // ============ Promise.all usage ===========
-
-  const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-  const updates = [];
-  for (const documentSnapshot of querySnapshot.docs) {
-    updates.push(documentSnapshot.ref.update({
-      isCompleted: !documentSnapshot.data().isCompleted,
-      updatedAt: _firebaseAdmin.default.firestore.Timestamp.now()
-    }));
-  }
+  const updates = querySnapshot.docs.map(doc => doc.ref.update({
+    isCompleted: !documentSnapshot.data().isCompleted,
+    updatedAt: _firebaseAdmin.default.firestore.Timestamp.now()
+  }));
   return await Promise.all(updates);
 }
 //# sourceMappingURL=todoRepository.js.map

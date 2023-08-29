@@ -35,14 +35,7 @@ async function getTodo(ctx) {
 }
 async function getTodos(ctx) {
   try {
-    const {
-      sort,
-      limit
-    } = ctx.params;
-    const todos = await (0, _todoRepository.getTodosWithParams)({
-      sort,
-      limit
-    });
+    const todos = await (0, _todoRepository.getTodosWithParams)(ctx.request.query);
     ctx.status = 200;
     return ctx.body = {
       data: todos,

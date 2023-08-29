@@ -26,9 +26,7 @@ export async function getTodo(ctx) {
 }
 export async function getTodos(ctx) {
   try {
-    const { sort, limit } = ctx.params;
-
-    const todos = await getTodosWithParams({ sort, limit });
+    const todos = await getTodosWithParams(ctx.request.query);
     ctx.status = 200;
     return (ctx.body = {
       data: todos,

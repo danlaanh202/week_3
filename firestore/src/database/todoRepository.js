@@ -1,6 +1,7 @@
 import admin from "firebase-admin";
 import db from "./db";
 import pickFields from "../helpers/utils/pickFields";
+import prepareDocs from "../helpers/utils/prepareDocs";
 
 const todoRef = db.collection("todos");
 const documentId = admin.firestore.FieldPath.documentId();
@@ -19,15 +20,15 @@ export async function getOneTodo(id, fields) {
 }
 
 export async function getTodosWithParams(params) {
-  const { sort = "desc", limit } = params;
+  const { sort = "desc", limit = 100 } = params;
 
   let orderRef = todoRef.orderBy("createdAt", sort);
   if (limit) {
-    orderRef = todoRef.orderBy("createdAt", sort).limit(limit);
+    orderRef = todoRef.orderBy("createdAt", sort).limit(parseInt(limit));
   }
   const snapshot = await orderRef.get();
-//viết làm prepareDocs cho đoạn return docs ra nhé để còn dùng ở ngoài chỗ 
-  return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+
+  return prepareDocs(snapshot);
 }
 
 export async function createTodo(data) {
@@ -45,25 +46,9 @@ export async function removeTodos(ids) {
     throw new Error();
   }
 
-  //todo: xóa bớt đoạn này đi cho nó clean nhé 
-
-  // ============ Batch writes usage ===========
-  /*
-  let batch = db.batch();
   const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-  for (const documentSnapshot of querySnapshot.docs) {
-    batch.delete(documentSnapshot.ref);
-  }
-  return batch.commit();
-  */
-  // ============ Promise.all usage ===========
-  const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-  const deletes = [];
 
-  // todo : chỗ này thay vì todo ta có thể dùng map nhé  nghiên cứu cách dùng nhé + không nên get lại 1 lần todos nũa nhé
-  for (const documentSnapshot of querySnapshot.docs) {
-    deletes.push(documentSnapshot.ref.delete());
-  }
+  const deletes = querySnapshot.docs.map((doc) => doc.ref.delete());
   return await Promise.all(deletes);
 }
 
@@ -71,30 +56,14 @@ export async function updateTodos(ids) {
   if (!ids?.length) {
     throw new Error();
   }
-  // ============ Batch writes usage ===========
-  /* let batch = db.batch();
-  const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-  for (const documentSnapshot of querySnapshot.docs) {
-    batch.update(documentSnapshot.ref, {
-      isCompleted: !documentSnapshot.doc().isCompleted,
-    });
-  }
-  return batch.commit();
-  */
-
-  // ============ Promise.all usage ===========
-
-  //todo : chỗ này tương tự remove  
 
   const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-  const updates = [];
-  for (const documentSnapshot of querySnapshot.docs) {
-    updates.push(
-      documentSnapshot.ref.update({
-        isCompleted: !documentSnapshot.data().isCompleted,
-        updatedAt: admin.firestore.Timestamp.now(),
-      })
-    );
-  }
+
+  const updates = querySnapshot.docs.map((doc) =>
+    doc.ref.update({
+      isCompleted: !documentSnapshot.data().isCompleted,
+      updatedAt: admin.firestore.Timestamp.now(),
+    })
+  );
   return await Promise.all(updates);
 }
