@@ -8,5 +8,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="week1" />
+    <orderEntry type="module" module-name="week2" />
+    <orderEntry type="module" module-name="mystagram" />
   </component>
 </module>

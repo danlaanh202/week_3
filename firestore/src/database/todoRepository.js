@@ -10,7 +10,7 @@ export async function getAllTodos() {
 
 export async function createTodo(data) {
   const generatedId = uuid();
-  const createdTodo = { ...data, createdAt: admin.firestore.Timestamp.now(), updatedAt:  admin.firestore.Timestamp.now() };
+  const createdTodo = { ...data, createdAt: admin.firestore.Timestamp.now(), updatedAt: admin.firestore.Timestamp.now() };
   await todoRef.doc(generatedId).set(createdTodo);
   return {...createdTodo, id: generatedId};
 }

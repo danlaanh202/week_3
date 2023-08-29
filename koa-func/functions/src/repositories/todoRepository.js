@@ -11,7 +11,7 @@ export async function getAllTodos() {
 export async function createTodo(data) {
   const generatedId = uuid();
   await todoRef.doc(generatedId).set(data);
-  return { ...data, id: generatedId };
+  return { ...data, id: generatedId, createdAt:  admin.firestore.Timestamp.now(), updatedAt:  admin.firestore.Timestamp.now(), };
 }
 
 export async function removeTodo(id) {
@@ -22,6 +22,7 @@ export async function toggleTodo(id) {
   const updateDoc = await todoRef.doc(id).get();
   await updateDoc.ref.update({
     isCompleted: !updateDoc.data().isCompleted,
+    updatedAt: admin.firestore.Timestamp.now(),
   });
 }
 export async function removeMultipleTodos(ids) {
@@ -70,6 +71,7 @@ export async function completeMultipleTodos(ids) {
     updates.push(
       documentSnapshot.ref.update({
         isCompleted: !documentSnapshot.data().isCompleted,
+        updatedAt:  admin.firestore.Timestamp.now(),
       })
     );
   }
