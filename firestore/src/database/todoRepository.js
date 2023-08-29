@@ -61,7 +61,7 @@ export async function updateTodos(ids) {
 
   const updates = querySnapshot.docs.map((doc) =>
     doc.ref.update({
-      isCompleted: !documentSnapshot.data().isCompleted,
+      isCompleted: !doc.data().isCompleted,
       updatedAt: admin.firestore.Timestamp.now(),
     })
   );

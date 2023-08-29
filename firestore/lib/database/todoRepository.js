@@ -67,7 +67,7 @@ async function updateTodos(ids) {
   }
   const querySnapshot = await todoRef.where(documentId, "in", ids).get();
   const updates = querySnapshot.docs.map(doc => doc.ref.update({
-    isCompleted: !documentSnapshot.data().isCompleted,
+    isCompleted: !doc.data().isCompleted,
     updatedAt: _firebaseAdmin.default.firestore.Timestamp.now()
   }));
   return await Promise.all(updates);
