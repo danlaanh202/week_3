@@ -23,6 +23,7 @@ export async function getTodosWithParams(params) {
     orderRef = orderRef.limit(limit);
   }
   const snapshot = await orderRef.get();
+//viết làm prepareDocs cho đoạn return docs ra nhé để còn dùng ở ngoài chỗ 
   return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
 }
 
@@ -41,6 +42,8 @@ export async function removeTodos(ids) {
     throw new Error();
   }
 
+  //todo: xóa bớt đoạn này đi cho nó clean nhé 
+
   // ============ Batch writes usage ===========
   /*
   let batch = db.batch();
@@ -53,6 +56,8 @@ export async function removeTodos(ids) {
   // ============ Promise.all usage ===========
   const querySnapshot = await todoRef.where(documentId, "in", ids).get();
   const deletes = [];
+
+  // todo : chỗ này thay vì todo ta có thể dùng map nhé  nghiên cứu cách dùng nhé + không nên get lại 1 lần todos nũa nhé
   for (const documentSnapshot of querySnapshot.docs) {
     deletes.push(documentSnapshot.ref.delete());
   }
@@ -74,6 +79,8 @@ export async function updateTodos(ids) {
   */
 
   // ============ Promise.all usage ===========
+
+  //todo : chỗ này tương tự remove  
 
   const querySnapshot = await todoRef.where(documentId, "in", ids).get();
   const updates = [];
