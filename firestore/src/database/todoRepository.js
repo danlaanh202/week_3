@@ -4,15 +4,15 @@ import { v4 as uuid } from "uuid";
 const todoRef = db.collection("todos");
 const documentId = admin.firestore.FieldPath.documentId();
 export async function getAllTodos() {
-  const snapshot = await todoRef.get();
+  const snapshot = await todoRef.orderBy("createdAt", "desc").get();
   return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
 }
 
 export async function createTodo(data) {
   const generatedId = uuid();
-  const createdTodo = { ...data, createdAt: admin.firestore.Timestamp.now() };
+  const createdTodo = { ...data, createdAt: admin.firestore.Timestamp.now(), updatedAt:  admin.firestore.Timestamp.now() };
   await todoRef.doc(generatedId).set(createdTodo);
-  return createdTodo;
+  return {...createdTodo, id: generatedId};
 }
 
 export async function removeTodo(id) {

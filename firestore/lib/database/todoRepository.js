@@ -16,7 +16,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const todoRef = _db.default.collection("todos");
 const documentId = _firebaseAdmin.default.firestore.FieldPath.documentId();
 async function getAllTodos() {
-  const snapshot = await todoRef.get();
+  const snapshot = await todoRef.orderBy("createdAt", "desc").get();
   return snapshot.docs.map(doc => ({
     ...doc.data(),
     id: doc.id
@@ -26,10 +26,14 @@ async function createTodo(data) {
   const generatedId = (0, _uuid.v4)();
   const createdTodo = {
     ...data,
-    createdAt: _firebaseAdmin.default.firestore.Timestamp.now()
+    createdAt: _firebaseAdmin.default.firestore.Timestamp.now(),
+    updatedAt: _firebaseAdmin.default.firestore.Timestamp.now()
   };
   await todoRef.doc(generatedId).set(createdTodo);
-  return createdTodo;
+  return {
+    ...createdTodo,
+    id: generatedId
+  };
 }
 async function removeTodo(id) {
   return await todoRef.doc(id).delete();

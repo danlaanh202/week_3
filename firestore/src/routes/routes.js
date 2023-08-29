@@ -8,10 +8,9 @@ const router = new Router({
 
 router.get("/todos", todoHandler.getTodos);
 router.post("/todo", todoInputMiddleware, todoHandler.createTd);
-router.put("/todo/:id", todoHandler.toggle);
 router.put("/todos", todoHandler.completeMultiple);
-router.delete("/todo/:id", todoHandler.remove);
+router.put("/todo/:id", todoHandler.toggle);
 router.delete("/todos", todoHandler.removeMultiple);
-// router.delele("/todos", todoHandler.removeMultiple) //http://localhost:5000/todos?ids=a&ids=b&...
+router.delete("/todo/:id", todoHandler.remove);
 
 export default router;
