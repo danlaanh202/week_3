@@ -1,15 +1,32 @@
 import {
   createTodo,
-  getAllTodos,
-  removeTodo,
-  removeMultipleTodos,
-  toggleTodo,
-  completeMultipleTodos,
+  getTodosWithParams,
+  removeTodos,
+  updateTodos,
+  getOneTodo,
 } from "../database/todoRepository";
 
+export async function getTodo(ctx) {
+  try {
+    const { id } = ctx.params;
+    const { fields } = ctx.request.body;
+    const todo = await getOneTodo(id, fields);
+    ctx.status = 200;
+    return (ctx.body = {
+      data: todo,
+      success: true,
+    });
+  } catch (error) {
+    ctx.status = 500;
+    return (ctx.body = {
+      success: false,
+      error: error.message,
+    });
+  }
+}
 export async function getTodos(ctx) {
   try {
-    const todos = await getAllTodos();
+    const todos = await getTodosWithParams(ctx.params);
     ctx.status = 200;
     return (ctx.body = {
       data: todos,
@@ -44,7 +61,7 @@ export async function createTd(ctx) {
 export async function remove(ctx) {
   try {
     const { id } = ctx.params;
-    await removeTodo(id);
+    await removeTodos([id]);
     ctx.status = 200;
     return (ctx.body = {
       success: true,
@@ -57,10 +74,10 @@ export async function remove(ctx) {
   }
 }
 
-export async function toggle(ctx) {
+export async function update(ctx) {
   try {
     const { id } = ctx.request.params;
-    await toggleTodo(id);
+    await updateTodos([id]);
     ctx.status = 200;
     return (ctx.body = {
       success: true,
@@ -73,10 +90,10 @@ export async function toggle(ctx) {
   }
 }
 
-export async function completeMultiple(ctx) {
+export async function updateMultiple(ctx) {
   try {
     const { ids } = ctx.request.body;
-    await completeMultipleTodos(ids);
+    await updateTodos(ids);
     ctx.status = 200;
     return (ctx.body = {
       success: true,
@@ -91,7 +108,7 @@ export async function completeMultiple(ctx) {
 export async function removeMultiple(ctx) {
   try {
     const { ids } = ctx.request.body;
-    await removeMultipleTodos(ids);
+    await removeTodos(ids);
     ctx.status = 200;
     return (ctx.body = {
       success: true,

@@ -1,42 +1,42 @@
 import admin from "firebase-admin";
 import db from "./db";
-import { v4 as uuid } from "uuid";
+import pickFields from "../helpers/utils/pickFields";
 
 const todoRef = db.collection("todos");
 const documentId = admin.firestore.FieldPath.documentId();
 
-//todo: viết tách ra cho dễ đọc nhé 
+export async function getOneTodo(id, fields) {
+  const docRef = await todoRef.doc(id).get();
+  const todo = { ...docRef.data(), id: docRef.id };
 
-export async function getAllTodos() {
-  // viết thêm cho anh đoạn nết anh muốn lấy theo params và limit số lượng nhé 
-  const snapshot = await todoRef.orderBy("createdAt", "desc").get();
+  if (fields?.length > 0) {
+    return pickFields(todo, fields);
+  }
+  return todo;
+}
+
+export async function getTodosWithParams(params) {
+  const { sort, limit } = params;
+
+  let orderRef = todoRef.orderBy("createdAt", sort);
+  if (limit) {
+    orderRef = orderRef.limit(limit);
+  }
+  const snapshot = await orderRef.get();
   return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
 }
 
 export async function createTodo(data) {
-  //todo : cần gì gen id nữa khi mà firestore đã gen id cho mình rồi nhỉ , check lại nhé 
-  const generatedId = uuid();
-  const createdTodo = { ...data, createdAt: admin.firestore.Timestamp.now(), updatedAt: admin.firestore.Timestamp.now() };
-  await todoRef.doc(generatedId).set(createdTodo);
-  return {...createdTodo, id: generatedId};
-}
-
-export async function removeTodo(id) {
-  return await todoRef.doc(id).delete();
-}
-
-
-//todo : đổi thành updateTodo cho nó tổng quát nhé + viết gộp lại chỉ dùng 1 hàm updateTodo thôi nhé 
-export async function toggleTodo(id) {
-  const updateDoc = await todoRef.doc(id).get();
-  return await updateDoc.ref.update({
-    isCompleted: !updateDoc.data().isCompleted,
+  const createdTodo = {
+    ...data,
+    createdAt: admin.firestore.Timestamp.now(),
     updatedAt: admin.firestore.Timestamp.now(),
-  });
+  };
+  const doc = await todoRef.add(createdTodo);
+  return { ...createdTodo, id: doc.id };
 }
 
-// todo: tương tự update , viết lại chỉ dùng 1 hàm 
-export async function removeMultipleTodos(ids) {
+export async function removeTodos(ids) {
   if (!ids?.length) {
     throw new Error();
   }
@@ -58,7 +58,7 @@ export async function removeMultipleTodos(ids) {
   }
   return await Promise.all(deletes);
 }
-export async function completeMultipleTodos(ids) {
+export async function updateTodos(ids) {
   if (!ids?.length) {
     throw new Error();
   }
@@ -87,5 +87,3 @@ export async function completeMultipleTodos(ids) {
   }
   return await Promise.all(updates);
 }
-
-//todo : viết thêm cho anh hàm getOneTodo nhé 

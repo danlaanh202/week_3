@@ -8,7 +8,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const app = new _koa.default();
 app.use((0, _cors.default)());
 app.use((0, _koaBody.default)({
-  parsedMethods: ["POST", "PUT", "PATCH", "DELETE"]
+  parsedMethods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
 }));
 app.use(_routes.default.routes());
 app.use(_routes.default.allowedMethods());

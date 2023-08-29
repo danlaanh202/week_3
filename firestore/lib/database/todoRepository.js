@@ -3,49 +3,56 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.completeMultipleTodos = completeMultipleTodos;
 exports.createTodo = createTodo;
-exports.getAllTodos = getAllTodos;
-exports.removeMultipleTodos = removeMultipleTodos;
-exports.removeTodo = removeTodo;
-exports.toggleTodo = toggleTodo;
+exports.getOneTodo = getOneTodo;
+exports.getTodosWithParams = getTodosWithParams;
+exports.removeTodos = removeTodos;
+exports.updateTodos = updateTodos;
 var _firebaseAdmin = _interopRequireDefault(require("firebase-admin"));
 var _db = _interopRequireDefault(require("./db"));
-var _uuid = require("uuid");
+var _pickFields = _interopRequireDefault(require("../helpers/utils/pickFields"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 const todoRef = _db.default.collection("todos");
 const documentId = _firebaseAdmin.default.firestore.FieldPath.documentId();
-async function getAllTodos() {
-  const snapshot = await todoRef.orderBy("createdAt", "desc").get();
+async function getOneTodo(id, fields) {
+  const docRef = await todoRef.doc(id).get();
+  const todo = {
+    ...docRef.data(),
+    id: docRef.id
+  };
+  if (fields?.length > 0) {
+    return (0, _pickFields.default)(todo, fields);
+  }
+  return todo;
+}
+async function getTodosWithParams(params) {
+  const {
+    sort,
+    limit
+  } = params;
+  let orderRef = todoRef.orderBy("createdAt", sort);
+  if (limit) {
+    orderRef = orderRef.limit(limit);
+  }
+  const snapshot = await orderRef.get();
   return snapshot.docs.map(doc => ({
     ...doc.data(),
     id: doc.id
   }));
 }
 async function createTodo(data) {
-  const generatedId = (0, _uuid.v4)();
   const createdTodo = {
     ...data,
     createdAt: _firebaseAdmin.default.firestore.Timestamp.now(),
     updatedAt: _firebaseAdmin.default.firestore.Timestamp.now()
   };
-  await todoRef.doc(generatedId).set(createdTodo);
+  const doc = await todoRef.add(createdTodo);
   return {
     ...createdTodo,
-    id: generatedId
+    id: doc.id
   };
 }
-async function removeTodo(id) {
-  return await todoRef.doc(id).delete();
-}
-async function toggleTodo(id) {
-  const updateDoc = await todoRef.doc(id).get();
-  return await updateDoc.ref.update({
-    isCompleted: !updateDoc.data().isCompleted,
-    updatedAt: _firebaseAdmin.default.firestore.Timestamp.now()
-  });
-}
-async function removeMultipleTodos(ids) {
+async function removeTodos(ids) {
   if (!ids?.length) {
     throw new Error();
   }
@@ -67,7 +74,7 @@ async function removeMultipleTodos(ids) {
   }
   return await Promise.all(deletes);
 }
-async function completeMultipleTodos(ids) {
+async function updateTodos(ids) {
   if (!ids?.length) {
     throw new Error();
   }

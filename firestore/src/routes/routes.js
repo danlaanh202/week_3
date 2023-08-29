@@ -6,10 +6,11 @@ const router = new Router({
   prefix: "/api",
 });
 
+router.get("/todo/:id", todoHandler.getTodo);
 router.get("/todos", todoHandler.getTodos);
 router.post("/todo", todoInputMiddleware, todoHandler.createTd);
-router.put("/todos", todoHandler.completeMultiple);
-router.put("/todo/:id", todoHandler.toggle);
+router.put("/todos", todoHandler.updateMultiple);
+router.put("/todo/:id", todoHandler.update);
 router.delete("/todos", todoHandler.removeMultiple);
 router.delete("/todo/:id", todoHandler.remove);
 
