@@ -77,7 +77,8 @@ export async function remove(ctx) {
 export async function update(ctx) {
   try {
     const { id } = ctx.request.params;
-    await updateTodos([id]);
+    const { todo } = ctx.request.body;
+    await updateTodos([todo]);
     ctx.status = 200;
     return (ctx.body = {
       success: true,
@@ -92,8 +93,9 @@ export async function update(ctx) {
 
 export async function updateMultiple(ctx) {
   try {
-    const { ids } = ctx.request.body;
-    await updateTodos(ids);
+    const { todos } = ctx.request.body;
+    console.log(todos);
+    await updateTodos(todos);
     ctx.status = 200;
     return (ctx.body = {
       success: true,

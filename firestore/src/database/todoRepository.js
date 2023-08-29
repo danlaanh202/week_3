@@ -46,22 +46,26 @@ export async function removeTodos(ids) {
     throw new Error();
   }
 
-  const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-
-  const deletes = querySnapshot.docs.map((doc) => doc.ref.delete());
+  const deletes = ids.map((id) => todoRef.doc(id).delete());
   return await Promise.all(deletes);
 }
 
-export async function updateTodos(ids) {
-  if (!ids?.length) {
+export async function updateTodos(todos) {
+  if (!todos?.length) {
     throw new Error();
   }
 
-  const querySnapshot = await todoRef.where(documentId, "in", ids).get();
+  // const querySnapshot = await todoRef.where(documentId, "in", ids).get();
 
-  const updates = querySnapshot.docs.map((doc) =>
-    doc.ref.update({
-      isCompleted: !doc.data().isCompleted,
+  // const updates = querySnapshot.docs.map((doc) =>
+  //   doc.ref.update({
+  //     isCompleted: !doc.data().isCompleted,
+  //     updatedAt: admin.firestore.Timestamp.now(),
+  //   })
+  // );
+  const updates = todos.map((todo) =>
+    todoRef.doc(todo.id).update({
+      isCompleted: todo.isCompleted,
       updatedAt: admin.firestore.Timestamp.now(),
     })
   );

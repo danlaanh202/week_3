@@ -87,7 +87,10 @@ async function update(ctx) {
     const {
       id
     } = ctx.request.params;
-    await (0, _todoRepository.updateTodos)([id]);
+    const {
+      todo
+    } = ctx.request.body;
+    await (0, _todoRepository.updateTodos)([todo]);
     ctx.status = 200;
     return ctx.body = {
       success: true
@@ -102,9 +105,10 @@ async function update(ctx) {
 async function updateMultiple(ctx) {
   try {
     const {
-      ids
+      todos
     } = ctx.request.body;
-    await (0, _todoRepository.updateTodos)(ids);
+    console.log(todos);
+    await (0, _todoRepository.updateTodos)(todos);
     ctx.status = 200;
     return ctx.body = {
       success: true
