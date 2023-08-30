@@ -1,12 +1,12 @@
 import {
   createTodo,
-  getTodosWithParams,
+  getTodos,
   removeTodos,
   updateTodos,
   getOneTodo,
 } from "../database/todoRepository";
 
-export async function getTodo(ctx) {
+export async function getOne(ctx) {
   try {
     const { id } = ctx.params;
     const { fields } = ctx.request.body;
@@ -24,9 +24,9 @@ export async function getTodo(ctx) {
     });
   }
 }
-export async function getTodos(ctx) {
+export async function getMany(ctx) {
   try {
-    const todos = await getTodosWithParams(ctx.request.query);
+    const todos = await getTodos(ctx.request.query);
     ctx.status = 200;
     return (ctx.body = {
       data: todos,
@@ -94,9 +94,6 @@ export async function update(ctx) {
 export async function updateMultiple(ctx) {
   try {
     const { todos } = ctx.request.body;
-    if (!todos?.length) {
-      throw new Error();
-    }
     await updateTodos(todos);
     ctx.status = 200;
     return (ctx.body = {

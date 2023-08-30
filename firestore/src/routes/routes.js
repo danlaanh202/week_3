@@ -6,8 +6,8 @@ const router = new Router({
   prefix: "/api",
 });
 
-router.get("/todo/:id", todoHandler.getTodo);
-router.get("/todos", todoHandler.getTodos);
+router.get("/todo/:id", todoHandler.getOne);
+router.get("/todos", todoHandler.getMany);
 router.post("/todo", todoInputMiddleware, todoHandler.createTd);
 router.put("/todos", todoHandler.updateMultiple);
 router.put("/todo/:id", todoHandler.update);

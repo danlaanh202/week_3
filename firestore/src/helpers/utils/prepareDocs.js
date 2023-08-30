@@ -1,6 +1,8 @@
 export function prepareDocs(querySnapshot) {
-  return querySnapshot.docs.map((doc) => prepareData(doc));
+  return querySnapshot.docs.map((doc) =>
+    prepareData({ ...doc.data(), id: doc.id })
+  );
 }
-export function prepareData(docRef) {
-  return { ...docRef.data(), id: docRef.id };
+export function prepareData(doc) {
+  return { ...doc.data(), id: doc.id };
 }

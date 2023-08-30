@@ -13,8 +13,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const router = new _koaRouter.default({
   prefix: "/api"
 });
-router.get("/todo/:id", todoHandler.getTodo);
-router.get("/todos", todoHandler.getTodos);
+router.get("/todo/:id", todoHandler.getOne);
+router.get("/todos", todoHandler.getMany);
 router.post("/todo", _todoInputMiddleware.default, todoHandler.createTd);
 router.put("/todos", todoHandler.updateMultiple);
 router.put("/todo/:id", todoHandler.update);

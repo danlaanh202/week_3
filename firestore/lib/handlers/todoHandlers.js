@@ -4,14 +4,14 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.createTd = createTd;
-exports.getTodo = getTodo;
-exports.getTodos = getTodos;
+exports.getMany = getMany;
+exports.getOne = getOne;
 exports.remove = remove;
 exports.removeMultiple = removeMultiple;
 exports.update = update;
 exports.updateMultiple = updateMultiple;
 var _todoRepository = require("../database/todoRepository");
-async function getTodo(ctx) {
+async function getOne(ctx) {
   try {
     const {
       id
@@ -33,9 +33,9 @@ async function getTodo(ctx) {
     };
   }
 }
-async function getTodos(ctx) {
+async function getMany(ctx) {
   try {
-    const todos = await (0, _todoRepository.getTodosWithParams)(ctx.request.query);
+    const todos = await (0, _todoRepository.getTodos)(ctx.request.query);
     ctx.status = 200;
     return ctx.body = {
       data: todos,
@@ -124,6 +124,9 @@ async function removeMultiple(ctx) {
     const {
       ids
     } = ctx.request.body;
+    if (!ids?.length) {
+      throw new Error();
+    }
     await (0, _todoRepository.removeTodos)(ids);
     ctx.status = 200;
     return ctx.body = {
