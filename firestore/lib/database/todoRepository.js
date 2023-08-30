@@ -31,7 +31,7 @@ async function getOneTodo(id, fields) {
 async function getTodosWithParams(params) {
   const {
     sort = "desc",
-    limit = 100
+    limit
   } = params;
   let orderRef = todoRef.orderBy("createdAt", sort);
   if (limit) {
