@@ -94,6 +94,9 @@ export async function update(ctx) {
 export async function updateMultiple(ctx) {
   try {
     const { todos } = ctx.request.body;
+    if (!todos?.length) {
+      throw new Error();
+    }
     await updateTodos(todos);
     ctx.status = 200;
     return (ctx.body = {
@@ -109,6 +112,9 @@ export async function updateMultiple(ctx) {
 export async function removeMultiple(ctx) {
   try {
     const { ids } = ctx.request.body;
+    if (!ids?.length) {
+      throw new Error();
+    }
     await removeTodos(ids);
     ctx.status = 200;
     return (ctx.body = {
