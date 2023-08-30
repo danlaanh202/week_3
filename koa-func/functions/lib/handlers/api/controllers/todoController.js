@@ -3,16 +3,39 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.completeMultiple = completeMultiple;
 exports.createTd = createTd;
-exports.getTodos = getTodos;
+exports.getMany = getMany;
+exports.getOne = getOne;
 exports.remove = remove;
 exports.removeMultiple = removeMultiple;
-exports.toggle = toggle;
+exports.update = update;
+exports.updateMultiple = updateMultiple;
 var _todoRepository = require("../../../repositories/todoRepository");
-async function getTodos(ctx) {
+async function getOne(ctx) {
   try {
-    const todos = await (0, _todoRepository.getAllTodos)();
+    const {
+      id
+    } = ctx.params;
+    const {
+      fields
+    } = ctx.req.body;
+    const todo = await (0, _todoRepository.getOneTodo)(id, fields);
+    ctx.status = 200;
+    return ctx.body = {
+      data: todo,
+      success: true
+    };
+  } catch (error) {
+    ctx.status = 500;
+    return ctx.body = {
+      success: false,
+      error: error.message
+    };
+  }
+}
+async function getMany(ctx) {
+  try {
+    const todos = await (0, _todoRepository.getTodos)(ctx.req.query);
     ctx.status = 200;
     return ctx.body = {
       data: todos,
@@ -30,6 +53,7 @@ async function getTodos(ctx) {
 async function createTd(ctx) {
   try {
     const data = await (0, _todoRepository.createTodo)(ctx.req.body);
+    ctx.status = 201;
     return ctx.body = {
       success: true,
       data
@@ -46,7 +70,7 @@ async function remove(ctx) {
     const {
       id
     } = ctx.params;
-    await (0, _todoRepository.removeTodo)(id);
+    await (0, _todoRepository.removeTodos)([id]);
     ctx.status = 200;
     return ctx.body = {
       success: true
@@ -58,13 +82,20 @@ async function remove(ctx) {
     };
   }
 }
-async function toggle(ctx) {
+async function update(ctx) {
   try {
     const {
       id
     } = ctx.params;
-    await (0, _todoRepository.toggleTodo)(id);
-    ctx.status = 201;
+    const {
+      todo
+    } = ctx.req.body;
+    console.log(id);
+    await (0, _todoRepository.updateTodos)([{
+      ...todo,
+      id
+    }]);
+    ctx.status = 200;
     return ctx.body = {
       success: true
     };
@@ -75,13 +106,13 @@ async function toggle(ctx) {
     };
   }
 }
-async function completeMultiple(ctx) {
+async function updateMultiple(ctx) {
   try {
     const {
-      ids
+      todos
     } = ctx.req.body;
-    await (0, _todoRepository.completeMultipleTodos)(ids);
-    ctx.status = 201;
+    await (0, _todoRepository.updateTodos)(todos);
+    ctx.status = 200;
     return ctx.body = {
       success: true
     };
@@ -97,12 +128,16 @@ async function removeMultiple(ctx) {
     const {
       ids
     } = ctx.req.body;
-    await (0, _todoRepository.removeMultipleTodos)(ids);
+    if (!ids?.length) {
+      throw new Error();
+    }
+    await (0, _todoRepository.removeTodos)(ids);
     ctx.status = 200;
     return ctx.body = {
       success: true
     };
   } catch (error) {
+    console.log(error);
     return ctx.body = {
       success: false,
       error: error.message

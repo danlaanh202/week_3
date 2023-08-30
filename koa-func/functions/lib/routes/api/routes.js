@@ -16,12 +16,14 @@ const router = new _koaRouter.default({
   prefix: "/api"
 });
 // ========================== Todo ============================
-router.get("/todos", todoController.getTodos);
+router.get("/todo/:id", todoController.getOne);
+router.get("/todos", todoController.getMany);
 router.post("/todo", _todoInputMiddleware.default, todoController.createTd);
-router.put("/todo/:id", todoController.toggle);
-router.put("/todos", todoController.completeMultiple);
-router.delete("/todo/:id", todoController.remove);
+router.put("/todos", todoController.updateMultiple);
+router.put("/todo/:id", todoController.update);
 router.delete("/todos", todoController.removeMultiple);
+router.delete("/todo/:id", todoController.remove);
+
 // ========================== Product shopify ============================
 router.get("/products", productController.getProducts);
 router.post("/product", productController.create);

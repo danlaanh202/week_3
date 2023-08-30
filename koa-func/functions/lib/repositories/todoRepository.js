@@ -3,89 +3,58 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.completeMultipleTodos = completeMultipleTodos;
 exports.createTodo = createTodo;
-exports.getAllTodos = getAllTodos;
-exports.removeMultipleTodos = removeMultipleTodos;
-exports.removeTodo = removeTodo;
-exports.toggleTodo = toggleTodo;
+exports.getOneTodo = getOneTodo;
+exports.getTodos = getTodos;
+exports.removeTodos = removeTodos;
+exports.updateTodos = updateTodos;
 var _firebaseAdmin = _interopRequireDefault(require("firebase-admin"));
 var _db = _interopRequireDefault(require("../config/db"));
-var _uuid = require("uuid");
+var _pickFields = _interopRequireDefault(require("../helpers/pickFields"));
+var _prepareDocs = require("../helpers/prepareDocs");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 const todoRef = _db.default.collection("todos");
-const documentId = _firebaseAdmin.default.firestore.FieldPath.documentId();
-async function getAllTodos() {
-  const snapshot = await todoRef.get();
-  return snapshot.docs.map(doc => ({
-    ...doc.data(),
-    id: doc.id
-  }));
+async function getOneTodo(id, fields) {
+  const docRef = await todoRef.doc(id).get();
+  const todo = (0, _prepareDocs.prepareData)(docRef);
+  if (fields?.length > 0) {
+    return (0, _pickFields.default)(todo, fields);
+  }
+  return todo;
+}
+async function getTodos(params) {
+  const {
+    sort = "desc",
+    limit
+  } = params;
+  let orderRef = todoRef.orderBy("createdAt", sort);
+  if (limit) {
+    orderRef = orderRef.limit(parseInt(limit));
+  }
+  const snapshot = await orderRef.get();
+  return (0, _prepareDocs.prepareDocs)(snapshot);
 }
 async function createTodo(data) {
-  const generatedId = (0, _uuid.v4)();
-  await todoRef.doc(generatedId).set(data);
-  return {
+  const createdTodo = {
     ...data,
-    id: generatedId
+    createdAt: _firebaseAdmin.default.firestore.Timestamp.now(),
+    updatedAt: _firebaseAdmin.default.firestore.Timestamp.now()
+  };
+  const doc = await todoRef.add(createdTodo);
+  return {
+    ...createdTodo,
+    id: doc.id
   };
 }
-async function removeTodo(id) {
-  return await todoRef.doc(id).delete();
-}
-async function toggleTodo(id) {
-  const updateDoc = await todoRef.doc(id).get();
-  await updateDoc.ref.update({
-    isCompleted: !updateDoc.data().isCompleted
-  });
-}
-async function removeMultipleTodos(ids) {
-  if (!ids?.length) {
-    throw new Error("");
-  }
-
-  // ============ Batch writes usage ===========
-  /*
-  let batch = db.batch();
-  const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-  for (const documentSnapshot of querySnapshot.docs) {
-    batch.delete(documentSnapshot.ref);
-  }
-  return batch.commit();
-  */
-  // ============ Promise.all usage ===========
-  const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-  const deletes = [];
-  for (const documentSnapshot of querySnapshot.docs) {
-    deletes.push(documentSnapshot.ref.delete());
-  }
+async function removeTodos(ids) {
+  const deletes = ids.map(id => todoRef.doc(id).delete());
   return await Promise.all(deletes);
 }
-async function completeMultipleTodos(ids) {
-  if (!ids?.length) {
-    throw new Error("");
-  }
-
-  // ============ Batch writes usage ===========
-  /* let batch = db.batch();
-  const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-  for (const documentSnapshot of querySnapshot.docs) {
-    batch.update(documentSnapshot.ref, {
-      isCompleted: true,
-    });
-  }
-  return batch.commit();
-  */
-
-  // ============ Promise.all usage ===========
-
-  const querySnapshot = await todoRef.where(documentId, "in", ids).get();
-  const updates = [];
-  for (const documentSnapshot of querySnapshot.docs) {
-    updates.push(documentSnapshot.ref.update({
-      isCompleted: !documentSnapshot.data().isCompleted
-    }));
-  }
+async function updateTodos(todos) {
+  const updates = todos.map(todo => todoRef.doc(todo.id).update({
+    isCompleted: todo.isCompleted,
+    updatedAt: _firebaseAdmin.default.firestore.Timestamp.now()
+  }));
   return await Promise.all(updates);
 }
 //# sourceMappingURL=todoRepository.js.map
