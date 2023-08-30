@@ -90,7 +90,10 @@ async function update(ctx) {
     const {
       todo
     } = ctx.request.body;
-    await (0, _todoRepository.updateTodos)([todo]);
+    await (0, _todoRepository.updateTodos)([{
+      ...todo,
+      id
+    }]);
     ctx.status = 200;
     return ctx.body = {
       success: true

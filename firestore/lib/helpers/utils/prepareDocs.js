@@ -6,10 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.prepareData = prepareData;
 exports.prepareDocs = prepareDocs;
 function prepareDocs(querySnapshot) {
-  return querySnapshot.docs.map(doc => prepareData({
-    ...doc.data(),
-    id: doc.id
-  }));
+  return querySnapshot.docs.map(doc => prepareData(doc));
 }
 function prepareData(doc) {
   return {

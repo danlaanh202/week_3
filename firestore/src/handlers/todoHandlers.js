@@ -78,7 +78,7 @@ export async function update(ctx) {
   try {
     const { id } = ctx.request.params;
     const { todo } = ctx.request.body;
-    await updateTodos([todo]);
+    await updateTodos([{ ...todo, id }]);
     ctx.status = 200;
     return (ctx.body = {
       success: true,

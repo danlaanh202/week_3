@@ -16,7 +16,7 @@ export async function getOneTodo(id, fields) {
   return todo;
 }
 
-export async function getTodosWithParams(params) {
+export async function getTodos(params) {
   const { sort = "desc", limit } = params;
 
   let orderRef = todoRef.orderBy("createdAt", sort);

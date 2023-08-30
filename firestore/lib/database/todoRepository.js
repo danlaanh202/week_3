@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.createTodo = createTodo;
 exports.getOneTodo = getOneTodo;
-exports.getTodosWithParams = getTodosWithParams;
+exports.getTodos = getTodos;
 exports.removeTodos = removeTodos;
 exports.updateTodos = updateTodos;
 var _firebaseAdmin = _interopRequireDefault(require("firebase-admin"));
@@ -22,7 +22,7 @@ async function getOneTodo(id, fields) {
   }
   return todo;
 }
-async function getTodosWithParams(params) {
+async function getTodos(params) {
   const {
     sort = "desc",
     limit
